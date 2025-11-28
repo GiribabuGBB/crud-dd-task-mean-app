@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  backend:
+    image: babup123/mean-backend:v1
+    container_name: mean-backend
+    restart: always
+    environment:
+      - DB_URL=mongodb://mongo:27017/mean-db
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+
+  frontend:
+    image: babup123/mean-frontend:v1
+    container_name: mean-frontend
+    restart: always
+    depends_on:
+      - backend
+
+  mongo:
+    image: mongo:latest
+    container_name: mean-mongo
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+
+  nginx:
+    image: nginx:stable
+    container_name: mean-nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  mongo-data:
+
